@@ -1,0 +1,14 @@
+## Interface: 50500
+## Title: Somora's EasySell
+## Version: 1.0.0
+## Author: Somora
+## Notes: Automatically sells vendor trash and optional item rarities at merchants.
+## SavedVariables: EasySellDB
+## SavedVariablesPerCharacter: EasySellCharDB
+## DefaultState: enabled
+
+Core.lua
+Items.lua
+Vendor.lua
+Options.lua
+Commands.lua
