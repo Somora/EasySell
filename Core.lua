@@ -6,12 +6,25 @@ local ES = EasySell
 
 ES.ADDON_NAME = ADDON_NAME
 ES.sessionTotal = ES.sessionTotal or 0
+ES.PROVIDER_EASYSELL = "easysell"
+ES.PROVIDER_ELVUI = "elvui"
+ES.PROVIDER_ZYGOR = "zygor"
+ES.ELVUI_ADDON_NAME = "ElvUI"
+ES.ZYGOR_ADDON_NAME = "ZygorGuidesViewer"
+ES.POPUP_NAME = "EASYSELL_PROVIDER_SELECT"
+ES.promptedSessionSignature = ES.promptedSessionSignature or nil
+ES.playerLoggedIn = ES.playerLoggedIn or false
 
 ES.defaults = {
     enabled = true,
+    provider = ES.PROVIDER_EASYSELL,
     maxQuality = 0,
     protectSoulbound = true,
     sellUnboundEquipment = false,
+    elvUIDetected = false,
+    zygorDetected = false,
+    providerPromptSignature = "",
+    zygorEnableVendorTools = nil,
     whitelist = {},
 }
 
@@ -96,6 +109,22 @@ local function MergeDefaults(db)
         db.sellUnboundEquipment = ES.defaults.sellUnboundEquipment
     end
 
+    if db.provider ~= ES.PROVIDER_EASYSELL and db.provider ~= ES.PROVIDER_ELVUI and db.provider ~= ES.PROVIDER_ZYGOR then
+        db.provider = ES.defaults.provider
+    end
+
+    if type(db.elvUIDetected) ~= "boolean" then
+        db.elvUIDetected = ES.defaults.elvUIDetected
+    end
+
+    if type(db.zygorDetected) ~= "boolean" then
+        db.zygorDetected = ES.defaults.zygorDetected
+    end
+
+    if type(db.providerPromptSignature) ~= "string" then
+        db.providerPromptSignature = ES.defaults.providerPromptSignature
+    end
+
     if type(db.whitelist) ~= "table" then
         db.whitelist = {}
     end
@@ -128,9 +157,14 @@ function ES:SetUseCharacterSettings(enabled)
 
     if enabled and not EasySellCharDB.copiedFromAccount then
         EasySellCharDB.enabled = EasySellDB.enabled
+        EasySellCharDB.provider = EasySellDB.provider
         EasySellCharDB.maxQuality = EasySellDB.maxQuality
         EasySellCharDB.protectSoulbound = EasySellDB.protectSoulbound
         EasySellCharDB.sellUnboundEquipment = EasySellDB.sellUnboundEquipment
+        EasySellCharDB.elvUIDetected = EasySellDB.elvUIDetected
+        EasySellCharDB.zygorDetected = EasySellDB.zygorDetected
+        EasySellCharDB.providerPromptSignature = EasySellDB.providerPromptSignature
+        EasySellCharDB.zygorEnableVendorTools = EasySellDB.zygorEnableVendorTools
         EasySellCharDB.whitelist = {}
 
         for itemID, whitelisted in pairs(EasySellDB.whitelist or {}) do
@@ -145,6 +179,10 @@ function ES:SetUseCharacterSettings(enabled)
     if self.RefreshOptions then
         self:RefreshOptions()
     end
+
+    if self.SyncProviderState then
+        self:SyncProviderState(false)
+    end
 end
 
 local frame = CreateFrame("Frame")
@@ -154,12 +192,26 @@ frame:SetScript("OnEvent", function(_, event, arg1)
     if event == "ADDON_LOADED" then
         if arg1 == ADDON_NAME then
             ES:InitializeDatabase()
-            frame:UnregisterEvent("ADDON_LOADED")
+        elseif arg1 == ES.ELVUI_ADDON_NAME or arg1 == ES.ZYGOR_ADDON_NAME then
+            ES:InitializeDatabase()
+            if ES.playerLoggedIn and ES.MaybePromptForProviderSelection and ES:MaybePromptForProviderSelection() then
+                return
+            end
+            if ES.playerLoggedIn and ES.SyncProviderState then
+                ES:SyncProviderState(false)
+            end
         end
         return
     end
 
     if event == "PLAYER_LOGIN" then
+        ES.playerLoggedIn = true
         Print("Loaded.")
+        if ES.MaybePromptForProviderSelection and ES:MaybePromptForProviderSelection() then
+            return
+        end
+        if ES.SyncProviderState then
+            ES:SyncProviderState(false)
+        end
     end
 end)

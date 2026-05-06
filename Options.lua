@@ -10,6 +10,12 @@ local QUALITY_OPTIONS = {
     { value = 4, label = "|cffa335eeepic|r" },
 }
 
+local PROVIDER_OPTIONS = {
+    { value = ES.PROVIDER_EASYSELL },
+    { value = ES.PROVIDER_ELVUI },
+    { value = ES.PROVIDER_ZYGOR },
+}
+
 local function CreateTitle(parent, text)
     local title = parent:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
     title:SetPoint("TOPLEFT", 16, -16)
@@ -48,6 +54,36 @@ local function InitializeRarityDropdown(dropdown)
             info.func = function()
                 ES:SetMaxQuality(option.value)
                 ES.Print("Selling up to " .. ES:GetMaxQualityLabel() .. ".")
+            end
+            UIDropDownMenu_AddButton(info)
+        end
+    end)
+
+    UIDropDownMenu_SetWidth(dropdown, 160)
+end
+
+local function InitializeProviderDropdown(dropdown)
+    if not UIDropDownMenu_CreateInfo then
+        return
+    end
+
+    UIDropDownMenu_Initialize(dropdown, function()
+        local db = ES:GetDB()
+        for _, option in ipairs(PROVIDER_OPTIONS) do
+            local info = UIDropDownMenu_CreateInfo()
+            local available = option.value == ES.PROVIDER_EASYSELL
+                or (option.value == ES.PROVIDER_ELVUI and db.elvUIDetected)
+                or (option.value == ES.PROVIDER_ZYGOR and db.zygorDetected)
+
+            info.text = ES:GetProviderLabel(option.value) .. (available and "" or " (not loaded)")
+            info.value = option.value
+            info.arg1 = option.value
+            info.checked = db.provider == option.value
+            info.disabled = not available
+            info.isNotRadio = false
+            info.keepShownOnClick = false
+            info.func = function()
+                ES:SetProvider(option.value)
             end
             UIDropDownMenu_AddButton(info)
         end
@@ -122,6 +158,9 @@ function ES:RefreshOptions()
         self.generalPanel.profileCheck:SetChecked(EasySellCharDB.useCharacterSettings)
         self.generalPanel.soulboundCheck:SetChecked(db.protectSoulbound)
         self.generalPanel.unboundCheck:SetChecked(db.sellUnboundEquipment)
+        if UIDropDownMenu_SetText and self.generalPanel.providerDropDown then
+            UIDropDownMenu_SetText(self.generalPanel.providerDropDown, "Provider: " .. self:GetProviderLabel(db.provider))
+        end
         if UIDropDownMenu_SetText and self.generalPanel.rarityDropDown then
             UIDropDownMenu_SetText(self.generalPanel.rarityDropDown, "Sell up to: " .. self:GetMaxQualityLabel())
         end
@@ -223,6 +262,7 @@ mainPanel.enabledCheck:SetPoint("TOPLEFT", mainPanel.description, "BOTTOMLEFT", 
 mainPanel.enabledCheck.Text:SetText("Enable automatic selling")
 mainPanel.enabledCheck:SetScript("OnClick", function(self)
     ES:GetDB().enabled = self:GetChecked()
+    ES:SyncProviderState(false)
 end)
 
 mainPanel.profileCheck = CreateFrame("CheckButton", nil, mainPanel, "InterfaceOptionsCheckButtonTemplate")
@@ -233,8 +273,15 @@ mainPanel.profileCheck:SetScript("OnClick", function(self)
     ES.Print("Using " .. (EasySellCharDB.useCharacterSettings and "character" or "account") .. " settings.")
 end)
 
+mainPanel.providerLabel = CreateText(mainPanel, "Provider", "GameFontNormal")
+mainPanel.providerLabel:SetPoint("TOPLEFT", mainPanel.profileCheck, "BOTTOMLEFT", 2, -18)
+
+mainPanel.providerDropDown = CreateFrame("Frame", "EasySellProviderDropDown", mainPanel, "UIDropDownMenuTemplate")
+mainPanel.providerDropDown:SetPoint("TOPLEFT", mainPanel.providerLabel, "BOTTOMLEFT", -18, -4)
+InitializeProviderDropdown(mainPanel.providerDropDown)
+
 mainPanel.rarityLabel = CreateText(mainPanel, "Rarity threshold", "GameFontNormal")
-mainPanel.rarityLabel:SetPoint("TOPLEFT", mainPanel.profileCheck, "BOTTOMLEFT", 2, -18)
+mainPanel.rarityLabel:SetPoint("TOPLEFT", mainPanel.providerDropDown, "BOTTOMLEFT", 18, -12)
 
 mainPanel.rarityDropDown = CreateFrame("Frame", "EasySellRarityDropDown", mainPanel, "UIDropDownMenuTemplate")
 mainPanel.rarityDropDown:SetPoint("TOPLEFT", mainPanel.rarityLabel, "BOTTOMLEFT", -18, -4)

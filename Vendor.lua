@@ -63,7 +63,12 @@ end
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("MERCHANT_SHOW")
 frame:SetScript("OnEvent", function()
-    if ES:GetDB().enabled then
+    if ES.MaybePromptForProviderSelection and ES:MaybePromptForProviderSelection() then
+        return
+    end
+
+    local db = ES:GetDB()
+    if db.enabled and db.provider == ES.PROVIDER_EASYSELL then
         ES:SellMatchingItems()
     end
 end)

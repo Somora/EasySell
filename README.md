@@ -2,7 +2,7 @@
 
 **EasySell** is a lightweight World of Warcraft addon that automatically sells vendor trash when you open a merchant. It pairs neatly with **EasyDelete**: EasyDelete clears deletion friction, EasySell clears bag clutter.
 
-Current release: `1.0.0`
+Current release: `1.0.1`
 
 ---
 
@@ -17,6 +17,8 @@ Current release: `1.0.0`
 - Tracks the total gold earned during your current login session
 - Protects soulbound items above grey quality by default
 - Preview what EasySell would sell before opening up broader rarity thresholds
+- Choose EasySell, ElvUI, or Zygor as the active auto-sell provider
+- Detects provider drift when ElvUI or Zygor auto-sell settings are changed outside EasySell
 - Uses a rarity dropdown in the options menu
 - Choose account-wide or per-character settings
 - Configure through Blizzard's AddOns options menu or simple `/esell` commands
@@ -33,6 +35,9 @@ Current release: `1.0.0`
 | `/esell on` | Enable automatic selling |
 | `/esell off` | Disable automatic selling |
 | `/esell status` | Show the current setting |
+| `/esell provider easysell` | Let EasySell handle automatic selling |
+| `/esell provider elvui` | Let ElvUI handle automatic grey selling |
+| `/esell provider zygor` | Let Zygor handle automatic grey selling |
 | `/esell preview` | Show what would be sold without selling anything |
 | `/esell session` | Show the total gold earned this login session |
 | `/esell options` | Open the EasySell options menu |
@@ -57,6 +62,7 @@ Soulbound protection is enabled by default. Grey soulbound vendor trash can stil
 Rarity thresholds above grey only apply to equipment. By default, that equipment must already be soulbound. Reagents, trade goods, consumables, BoE gear, Warbound-until-equipped gear, and similar non-equipment items are not sold automatically.
 
 In the options menu, use **Preview** or shift-click the rarity dropdown to preview the current selling rules.
+If ElvUI or Zygor is loaded, EasySell can hand off grey selling to that addon and will disable the other providers to avoid double-selling.
 
 ---
 

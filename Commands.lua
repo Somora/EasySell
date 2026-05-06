@@ -11,7 +11,10 @@ local tostring = tostring
 local function PrintStatus()
     local db = ES:GetDB()
     local profile = EasySellCharDB.useCharacterSettings and "character" or "account"
-    ES.Print("Auto sell is " .. ES:GetStatusText(db.enabled) .. ". Selling up to " .. ES:GetMaxQualityLabel() .. ". Soulbound protection is " .. ES:GetStatusText(db.protectSoulbound) .. ". Unbound equipment selling is " .. ES:GetStatusText(db.sellUnboundEquipment) .. ". Profile: " .. profile .. ".")
+    local provider = ES:GetProviderLabel(db.provider)
+    local elvUIStatus = db.elvUIDetected and "detected" or "not detected"
+    local zygorStatus = db.zygorDetected and "detected" or "not detected"
+    ES.Print("Auto sell is " .. ES:GetStatusText(db.enabled) .. ". Provider: " .. provider .. ". ElvUI: " .. elvUIStatus .. ". Zygor: " .. zygorStatus .. ". Selling up to " .. ES:GetMaxQualityLabel() .. ". Soulbound protection is " .. ES:GetStatusText(db.protectSoulbound) .. ". Unbound equipment selling is " .. ES:GetStatusText(db.sellUnboundEquipment) .. ". Profile: " .. profile .. ".")
 end
 
 local function PrintSession()
@@ -32,21 +35,25 @@ SlashCmdList.EASYSELL = function(msg)
 
     if msg == "on" then
         db.enabled = true
+        ES:SyncProviderState(false)
         ES.Print("Auto sell is now enabled.")
     elseif msg == "off" then
         db.enabled = false
+        ES:SyncProviderState(false)
         ES.Print("Auto sell is now disabled.")
     elseif msg == "" or msg == "toggle" then
         db.enabled = not db.enabled
+        ES:SyncProviderState(false)
         ES.Print("Auto sell is now " .. ES:GetStatusText(db.enabled) .. ".")
     elseif msg == "status" then
+        ES:MaybePromptForProviderSelection()
         PrintStatus()
     elseif msg == "session" then
         PrintSession()
     elseif msg == "preview" then
         ES:PrintPreview()
     elseif msg == "help" then
-        ES.Print("Usage: /esell, /esell on/off, /esell status, /esell preview, /esell session, /esell options, /esell profile, /esell soulbound, /esell unbound, /esell poor/common/uncommon/rare/epic, /esell keep [item], /esell keep cursor, or /esell unkeep [item].")
+        ES.Print("Usage: /esell, /esell on/off, /esell status, /esell provider easysell/elvui/zygor, /esell preview, /esell session, /esell options, /esell profile, /esell soulbound, /esell unbound, /esell poor/common/uncommon/rare/epic, /esell keep [item], /esell keep cursor, or /esell unkeep [item].")
     elseif msg == "options" or msg == "config" then
         if ES.OpenOptions then
             ES:OpenOptions()
@@ -84,6 +91,12 @@ SlashCmdList.EASYSELL = function(msg)
     elseif msg == "profile character" then
         ES:SetUseCharacterSettings(true)
         ES.Print("Using character settings.")
+    elseif msg == "provider easysell" or msg == "provider easy" or msg == "provider es" then
+        ES:SetProvider(ES.PROVIDER_EASYSELL)
+    elseif msg == "provider elvui" then
+        ES:SetProvider(ES.PROVIDER_ELVUI)
+    elseif msg == "provider zygor" then
+        ES:SetProvider(ES.PROVIDER_ZYGOR)
     elseif msg == "keep cursor" then
         local cursorType, itemID, itemLink = GetCursorInfo()
         itemID = itemID or ES:GetItemIDFromLink(itemLink)

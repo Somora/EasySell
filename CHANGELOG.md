@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1
+
+- Adds provider selection for EasySell, ElvUI, and Zygor.
+- Adds login/reload provider selection and drift detection when ElvUI or Zygor auto-sell settings change outside EasySell.
+- Syncs ElvUI grey selling through ElvUI's current vendor grays setting.
+- Preserves Zygor vendor tools state while handing grey selling to Zygor.
+
 ## 1.0.0
 
 - Initial release.
