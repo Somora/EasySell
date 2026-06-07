@@ -33,7 +33,7 @@ function ES:ShowProviderPopup(providers)
             end
 
             if pendingPopupData then
-                ES:GetDB().providerPromptSignature = pendingPopupData.signature
+                ES:GetDB().providerPromptSignature = "dismissed"
             end
             pendingPopupData = nil
             ES.Print("Provider selection skipped. Use /esell provider easysell, /esell provider elvui, or /esell provider zygor anytime.")
@@ -76,7 +76,11 @@ function ES:MaybePromptForProviderSelection()
         return true
     end
 
-    if db.providerPromptSignature == signature then
+    if db.providerPromptSignature ~= "" then
+        return false
+    end
+
+    if self.promptedSessionSignature == signature then
         return false
     end
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.2
+
+- Prevents the provider selection popup from reappearing only because Zygor is enabled on one character and disabled on another.
+- Keeps provider drift detection active for real ElvUI or Zygor auto-sell setting changes.
+
 ## 1.0.1
 
 - Adds provider selection for EasySell, ElvUI, and Zygor.

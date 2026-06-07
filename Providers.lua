@@ -229,8 +229,8 @@ end
 function ES:SetProvider(provider)
     local db = self:GetDB()
     db.provider = provider
-    db.providerPromptSignature = self:BuildProviderSignature(self:GetAvailableProviders())
-    self.promptedSessionSignature = db.providerPromptSignature
+    db.providerPromptSignature = "selected"
+    self.promptedSessionSignature = self:BuildProviderSignature(self:GetAvailableProviders())
     self:SyncProviderState(true)
 
     if provider == self.PROVIDER_ELVUI then
