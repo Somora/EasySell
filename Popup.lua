@@ -1,9 +1,90 @@
 local ES = EasySell
 
-local StaticPopup_Show = StaticPopup_Show
-local StaticPopupDialogs = StaticPopupDialogs
-
+local CreateFrame = CreateFrame
+local UIParent = UIParent
 local pendingPopupData
+local providerFrame
+
+local function SetTextureColor(texture, red, green, blue, alpha)
+    if texture.SetColorTexture then
+        texture:SetColorTexture(red, green, blue, alpha)
+    else
+        texture:SetTexture(red, green, blue, alpha)
+    end
+end
+
+local function HideProviderPopup()
+    if providerFrame then
+        providerFrame:Hide()
+    end
+
+    pendingPopupData = nil
+end
+
+local function SelectProvider(provider)
+    ES:SetProvider(provider)
+    HideProviderPopup()
+end
+
+local function DismissProviderPopup()
+    if pendingPopupData then
+        ES:GetDB().providerPromptSignature = "dismissed"
+    end
+
+    HideProviderPopup()
+    ES.Print("Provider selection skipped. Use /esell provider easysell, /esell provider elvui, or /esell provider zygor anytime.")
+end
+
+local function CreateProviderFrame()
+    if providerFrame then
+        return providerFrame
+    end
+
+    local frame = CreateFrame("Frame", "EasySellProviderPopup", UIParent)
+    frame:SetSize(430, 118)
+    frame:SetPoint("CENTER")
+    frame:SetFrameStrata("DIALOG")
+    frame:SetToplevel(true)
+    frame:EnableMouse(true)
+    frame:EnableKeyboard(true)
+    frame:Hide()
+
+    frame.background = frame:CreateTexture(nil, "BACKGROUND")
+    frame.background:SetAllPoints()
+    SetTextureColor(frame.background, 0, 0, 0, 0.9)
+
+    frame.border = frame:CreateTexture(nil, "BORDER")
+    frame.border:SetPoint("TOPLEFT", 1, -1)
+    frame.border:SetPoint("BOTTOMRIGHT", -1, 1)
+    SetTextureColor(frame.border, 0.18, 0.18, 0.18, 1)
+
+    frame.inner = frame:CreateTexture(nil, "ARTWORK")
+    frame.inner:SetPoint("TOPLEFT", 2, -2)
+    frame.inner:SetPoint("BOTTOMRIGHT", -2, 2)
+    SetTextureColor(frame.inner, 0.02, 0.02, 0.02, 0.95)
+
+    frame.text = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    frame.text:SetPoint("TOP", 0, -18)
+    frame.text:SetWidth(390)
+    frame.text:SetText("Choose which addon should handle automatic selling.")
+
+    frame.buttons = {}
+    for index = 1, 3 do
+        local button = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+        button:SetSize(118, 24)
+        button:SetPoint("BOTTOMLEFT", 30 + ((index - 1) * 128), 22)
+        frame.buttons[index] = button
+    end
+
+    frame:SetScript("OnKeyDown", function(_, key)
+        if key == "ESCAPE" then
+            DismissProviderPopup()
+        end
+    end)
+
+    providerFrame = frame
+    return providerFrame
+end
 
 function ES:ShowProviderPopup(providers)
     pendingPopupData = {
@@ -11,46 +92,22 @@ function ES:ShowProviderPopup(providers)
         signature = self:BuildProviderSignature(providers),
     }
 
-    local labels = {}
+    local frame = CreateProviderFrame()
     for index, provider in ipairs(providers) do
-        labels[index] = self:GetProviderLabel(provider)
+        local selectedProvider = provider
+        local button = frame.buttons[index]
+        button:SetText(self:GetProviderLabel(selectedProvider))
+        button:SetScript("OnClick", function()
+            SelectProvider(selectedProvider)
+        end)
+        button:Show()
     end
 
-    StaticPopupDialogs[self.POPUP_NAME] = {
-        text = "Choose which addon should handle automatic selling.",
-        button1 = labels[1],
-        button2 = labels[2],
-        button3 = labels[3],
-        OnAccept = function()
-            ES:SetProvider(pendingPopupData.providers[1])
-            pendingPopupData = nil
-        end,
-        OnCancel = function(_, reason)
-            if reason == "clicked" and pendingPopupData and pendingPopupData.providers[2] then
-                ES:SetProvider(pendingPopupData.providers[2])
-                pendingPopupData = nil
-                return
-            end
+    for index = #providers + 1, #frame.buttons do
+        frame.buttons[index]:Hide()
+    end
 
-            if pendingPopupData then
-                ES:GetDB().providerPromptSignature = "dismissed"
-            end
-            pendingPopupData = nil
-            ES.Print("Provider selection skipped. Use /esell provider easysell, /esell provider elvui, or /esell provider zygor anytime.")
-        end,
-        OnAlt = function()
-            if pendingPopupData and pendingPopupData.providers[3] then
-                ES:SetProvider(pendingPopupData.providers[3])
-            end
-            pendingPopupData = nil
-        end,
-        timeout = 0,
-        whileDead = true,
-        hideOnEscape = true,
-        preferredIndex = 3,
-    }
-
-    StaticPopup_Show(self.POPUP_NAME)
+    frame:Show()
 end
 
 function ES:MaybePromptForProviderSelection()

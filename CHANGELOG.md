@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3
+
+- Replaces the provider selection StaticPopup with a custom EasySell dialog to avoid Blizzard protected popup taint during logout.
+
 ## 1.0.2
 
 - Prevents the provider selection popup from reappearing only because Zygor is enabled on one character and disabled on another.
