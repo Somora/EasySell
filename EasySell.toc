@@ -1,6 +1,6 @@
-## Interface: 120005
+## Interface: 120007
 ## Title: Somora's EasySell
-## Version: 1.0.3
+## Version: 1.0.4
 ## Author: Somora
 ## Notes: Automatically sells vendor trash and optional item rarities at merchants.
 ## SavedVariables: EasySellDB

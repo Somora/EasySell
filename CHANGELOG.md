@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4
+
+- Updates the Retail TOC interface version to 120007.
+
 ## 1.0.3
 
 - Replaces the provider selection StaticPopup with a custom EasySell dialog to avoid Blizzard protected popup taint during logout.
