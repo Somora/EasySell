@@ -2,7 +2,7 @@
 
 **EasySell** is a lightweight World of Warcraft addon that automatically sells vendor trash when you open a merchant. It pairs neatly with **EasyDelete**: EasyDelete clears deletion friction, EasySell clears bag clutter.
 
-Current release: `1.0.4`
+Current release: `1.0.5`
 
 ---
 

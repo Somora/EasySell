@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.5
+
+- Updates the Retail TOC interface version to 120100.
+
 ## 1.0.4
 
 - Updates the Retail TOC interface version to 120007.
