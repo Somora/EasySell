@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.6
+
+- Fixes selling and preview errors on clients without the legacy global GetItemInfo API by using C_Item.GetItemInfo with a fallback for older clients.
+
 ## 1.0.5
 
 - Updates the Retail TOC interface version to 120100.

@@ -4,7 +4,7 @@ local CreateFrame = CreateFrame
 local GetContainerNumSlots = GetContainerNumSlots
 local GetContainerItemInfo = GetContainerItemInfo
 local GetContainerItemLink = GetContainerItemLink
-local GetItemInfo = GetItemInfo
+local GetItemInfo = (C_Item and C_Item.GetItemInfo) or GetItemInfo
 local ITEM_SOULBOUND = ITEM_SOULBOUND
 local NUM_BAG_SLOTS = NUM_BAG_SLOTS
 local UIParent = UIParent
@@ -120,8 +120,8 @@ function ES:UseBagItem(bag, slot)
 end
 
 local function GetItemValue(link)
-    if not link then
-        return 0
+    if not link or not GetItemInfo then
+        return nil, 0
     end
 
     local _, _, quality, _, _, _, _, _, equipLoc, _, sellPrice, classID, _, bindType = GetItemInfo(link)
