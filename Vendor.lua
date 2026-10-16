@@ -2,7 +2,7 @@ local ES = EasySell
 
 local C_Timer = C_Timer
 local CreateFrame = CreateFrame
-local GetCoinTextureString = GetCoinTextureString
+local GetCoinTextureString = (C_CurrencyInfo and C_CurrencyInfo.GetCoinTextureString) or GetCoinTextureString
 local ipairs = ipairs
 
 local isSelling = false

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.8
+
+- Fixes options refresh, session totals, and vendor messages on Retail 12.1.5 by using C_CurrencyInfo.GetCoinTextureString with a fallback for older clients.
+
 ## 1.0.7
 
 - Updates the Retail TOC interface version to 120105 for WoW 12.1.5.

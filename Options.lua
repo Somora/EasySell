@@ -1,5 +1,7 @@
 local ES = EasySell
 
+local GetCoinTextureString = (C_CurrencyInfo and C_CurrencyInfo.GetCoinTextureString) or GetCoinTextureString
+
 local whitelistRows = {}
 
 local QUALITY_OPTIONS = {

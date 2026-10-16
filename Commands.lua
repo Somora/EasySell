@@ -1,7 +1,7 @@
 local ES = EasySell
 
 local ClearCursor = ClearCursor
-local GetCoinTextureString = GetCoinTextureString
+local GetCoinTextureString = (C_CurrencyInfo and C_CurrencyInfo.GetCoinTextureString) or GetCoinTextureString
 local GetCursorInfo = GetCursorInfo
 local strlower = strlower
 local strmatch = strmatch
