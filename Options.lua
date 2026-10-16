@@ -39,6 +39,12 @@ local function CreateButton(parent, text, width)
     return button
 end
 
+local function CreateCheckButton(parent)
+    local button = CreateFrame("CheckButton", nil, parent, "UICheckButtonTemplate")
+    button:SetSize(26, 26)
+    return button
+end
+
 local function InitializeRarityDropdown(dropdown)
     if not UIDropDownMenu_CreateInfo then
         return
@@ -259,7 +265,7 @@ mainPanel.title = CreateTitle(mainPanel, "EasySell")
 mainPanel.description = CreateText(mainPanel, "Automatically sells vendor trash and optional item rarities at merchants.")
 mainPanel.description:SetPoint("TOPLEFT", mainPanel.title, "BOTTOMLEFT", 0, -8)
 
-mainPanel.enabledCheck = CreateFrame("CheckButton", nil, mainPanel, "InterfaceOptionsCheckButtonTemplate")
+mainPanel.enabledCheck = CreateCheckButton(mainPanel)
 mainPanel.enabledCheck:SetPoint("TOPLEFT", mainPanel.description, "BOTTOMLEFT", 0, -18)
 mainPanel.enabledCheck.Text:SetText("Enable automatic selling")
 mainPanel.enabledCheck:SetScript("OnClick", function(self)
@@ -267,7 +273,7 @@ mainPanel.enabledCheck:SetScript("OnClick", function(self)
     ES:SyncProviderState(false)
 end)
 
-mainPanel.profileCheck = CreateFrame("CheckButton", nil, mainPanel, "InterfaceOptionsCheckButtonTemplate")
+mainPanel.profileCheck = CreateCheckButton(mainPanel)
 mainPanel.profileCheck:SetPoint("TOPLEFT", mainPanel.enabledCheck, "BOTTOMLEFT", 0, -8)
 mainPanel.profileCheck.Text:SetText("Use per-character settings")
 mainPanel.profileCheck:SetScript("OnClick", function(self)
@@ -310,14 +316,14 @@ mainPanel.previewButton:SetScript("OnClick", function()
     ES:PrintPreview()
 end)
 
-mainPanel.soulboundCheck = CreateFrame("CheckButton", nil, mainPanel, "InterfaceOptionsCheckButtonTemplate")
+mainPanel.soulboundCheck = CreateCheckButton(mainPanel)
 mainPanel.soulboundCheck:SetPoint("TOPLEFT", mainPanel.rarityDropDown, "BOTTOMLEFT", 18, -12)
 mainPanel.soulboundCheck.Text:SetText("Protect soulbound items above grey")
 mainPanel.soulboundCheck:SetScript("OnClick", function(self)
     ES:GetDB().protectSoulbound = self:GetChecked()
 end)
 
-mainPanel.unboundCheck = CreateFrame("CheckButton", nil, mainPanel, "InterfaceOptionsCheckButtonTemplate")
+mainPanel.unboundCheck = CreateCheckButton(mainPanel)
 mainPanel.unboundCheck:SetPoint("TOPLEFT", mainPanel.soulboundCheck, "BOTTOMLEFT", 0, -8)
 mainPanel.unboundCheck.Text:SetText("Allow selling BoE and Warbound equipment")
 mainPanel.unboundCheck:SetScript("OnClick", function(self)

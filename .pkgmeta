@@ -3,6 +3,7 @@
 manual-changelog: CHANGELOG.md
 
 ignore:
+  - tests
   - .git
   - .github
   - .gitattributes

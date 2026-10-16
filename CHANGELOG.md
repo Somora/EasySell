@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.9
+
+- Replaces the deprecated options checkbox template with UICheckButtonTemplate, preserving checkbox dimensions.
+- Adds Lua 5.1 compatibility scenarios covering modern Retail APIs without legacy globals and older Classic API fallbacks.
+
 ## 1.0.8
 
 - Fixes options refresh, session totals, and vendor messages on Retail 12.1.5 by using C_CurrencyInfo.GetCoinTextureString with a fallback for older clients.
