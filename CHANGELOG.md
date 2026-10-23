@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.10
+
+- Uses C_Item.IsBound for Retail binding checks instead of rendering and scanning tooltips; retains an older-client fallback that rejects secret tooltip text.
+- Prevents item-use calls outside an open merchant or during combat lockdown.
+- Releases the selling lock after container-call errors and before displaying summaries, so UI errors cannot permanently stop selling.
+- Counts only submitted stacks if the merchant closes during a sale; totals remain estimates, not server-confirmed proceeds.
+- Adds regression checks for these cases and documents the limits of secret/taint simulation.
+
 ## 1.0.9
 
 - Replaces the deprecated options checkbox template with UICheckButtonTemplate, preserving checkbox dimensions.

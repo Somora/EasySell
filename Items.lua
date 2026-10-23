@@ -16,7 +16,7 @@ local type = type
 
 local ITEM_CLASS_WEAPON = LE_ITEM_CLASS_WEAPON or (Enum and Enum.ItemClass and Enum.ItemClass.Weapon) or 2
 local ITEM_CLASS_ARMOR = LE_ITEM_CLASS_ARMOR or (Enum and Enum.ItemClass and Enum.ItemClass.Armor) or 4
-local tooltip = CreateFrame("GameTooltip", "EasySellTooltip", UIParent, "GameTooltipTemplate")
+local tooltip
 
 function ES:GetItemIDFromLink(link)
     if type(link) ~= "string" then
@@ -111,12 +111,22 @@ local function GetBagItemInfo(bag, slot)
 end
 
 function ES:UseBagItem(bag, slot)
-    if C_Container and C_Container.UseContainerItem then
-        C_Container.UseContainerItem(bag, slot)
-        return
+    -- Outside a merchant this API uses/equips the item instead of selling it.
+    if not MerchantFrame or not MerchantFrame:IsShown() or (InCombatLockdown and InCombatLockdown()) then
+        return false
     end
 
-    UseContainerItem(bag, slot)
+    if C_Container and C_Container.UseContainerItem then
+        C_Container.UseContainerItem(bag, slot)
+        return true
+    end
+
+    if UseContainerItem then
+        UseContainerItem(bag, slot)
+        return true
+    end
+
+    return false
 end
 
 local function GetItemValue(link)
@@ -130,17 +140,28 @@ local function GetItemValue(link)
 end
 
 function ES:IsBagItemSoulbound(bag, slot)
-    if not tooltip or not ITEM_SOULBOUND then
+    if C_Item and C_Item.IsBound and ItemLocation and ItemLocation.CreateFromBagAndSlot then
+        return C_Item.IsBound(ItemLocation:CreateFromBagAndSlot(bag, slot))
+    end
+
+    if not ITEM_SOULBOUND then
         return false
     end
 
+    -- Older clients lack the location-based binding API.
+    tooltip = tooltip or CreateFrame("GameTooltip", "EasySellTooltip", UIParent, "GameTooltipTemplate")
     tooltip:SetOwner(UIParent, "ANCHOR_NONE")
     tooltip:ClearLines()
     tooltip:SetBagItem(bag, slot)
 
     for lineIndex = 2, tooltip:NumLines() do
         local line = _G["EasySellTooltipTextLeft" .. lineIndex]
-        if line and line:GetText() == ITEM_SOULBOUND then
+        local text = line and line:GetText()
+        if issecretvalue and issecretvalue(text) then
+            tooltip:Hide()
+            return nil
+        end
+        if text == ITEM_SOULBOUND then
             tooltip:Hide()
             return true
         end
@@ -152,7 +173,8 @@ end
 
 local function IsProtectedSoulbound(itemQuality, bindType, bag, slot)
     local db = ES:GetDB()
-    return db.protectSoulbound and itemQuality and itemQuality > 0 and (ES:IsBagItemSoulbound(bag, slot) or bindType == 1)
+    -- Unknown binding data must not bypass protection when unbound selling is on.
+    return db.protectSoulbound and itemQuality and itemQuality > 0 and (ES:IsBagItemSoulbound(bag, slot) ~= false or bindType == 1)
 end
 
 local function IsSellableCategory(itemQuality, classID, equipLoc, bag, slot)

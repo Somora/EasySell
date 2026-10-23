@@ -16,6 +16,7 @@ function methods:HookScript(name, callback) self.scripts[name] = callback end
 function methods:RegisterEvent(event) self.events[event] = true end
 function methods:Show() self.shown = true end
 function methods:Hide() self.shown = false end
+function methods:IsShown() return self.shown end
 function methods:SetShown(value) self.shown = value end
 function methods:GetHeight() return 404 end
 function methods:SetMinMaxValues(low, high) self.low, self.high = low, high end
@@ -42,6 +43,10 @@ function CreateFrame(kind, name, parent, template)
     return frame
 end
 UIParent = object()
+MerchantFrame = object()
+MerchantFrame:Show()
+function InCombatLockdown() return TEST_COMBAT or false end
+function issecretvalue(value) return value == TEST_SECRET and TEST_SECRET ~= nil end
 function print(message) TEST_MESSAGES[#TEST_MESSAGES + 1] = message end
 strmatch, strlower = string.match, string.lower
 function strtrim(s) return (s:gsub("^%s+", ""):gsub("%s+$", "")) end
@@ -81,18 +86,26 @@ local function container(bag, slot)
     return {hyperlink = "item:" .. id, stackCount = item.count, quality = item.quality,
         isLocked = item.locked, hasNoValue = item.noValue}
 end
-local function use(bag, slot) TEST_SOLD[#TEST_SOLD + 1] = {bag, slot} end
+local function use(bag, slot)
+    if TEST_USE_ERROR then error("simulated use failure") end
+    TEST_SOLD[#TEST_SOLD + 1] = {bag, slot}
+    if TEST_CLOSE_MERCHANT then MerchantFrame:Hide() end
+end
 local function money(value) return tostring(value) .. " copper" end
 function methods:SetBagItem(bag, slot)
+    TEST_TOOLTIP_SCANS = (TEST_TOOLTIP_SCANS or 0) + 1
     local item = TEST_ITEMS[TEST_BAGS[slot]]
     EasySellTooltipTextLeft2 = object()
-    EasySellTooltipTextLeft2:SetText(item.bound and ITEM_SOULBOUND or "Unbound")
+    EasySellTooltipTextLeft2:SetText(TEST_SECRET or (item.bound and ITEM_SOULBOUND or "Unbound"))
 end
 function methods:NumLines() return 2 end
 if TEST_CLIENT == "retail" then
     -- No legacy GetItemInfo, GetCoinTextureString, container globals,
     -- IsAddOnLoaded, LE_ITEM_CLASS_*, or InterfaceOptions_* helpers.
-    C_Item = {GetItemInfo = info}
+    ItemLocation = {CreateFromBagAndSlot = function(_, bag, slot) return {bag = bag, slot = slot} end}
+    C_Item = {GetItemInfo = info, IsBound = function(location)
+        return TEST_ITEMS[TEST_BAGS[location.slot]].bound
+    end}
     C_CurrencyInfo = {GetCoinTextureString = money}
     C_Container = {GetContainerNumSlots = slots, GetContainerItemInfo = container,
         UseContainerItem = use}

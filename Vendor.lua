@@ -28,29 +28,41 @@ function ES:PrintPreview()
 end
 
 function ES:SellMatchingItems()
-    if isSelling then
+    if isSelling or not MerchantFrame or not MerchantFrame:IsShown() or (InCombatLockdown and InCombatLockdown()) then
         return
     end
 
-    local matches, expectedMoney = self:GetMatchingItems()
+    local matches = self:GetMatchingItems()
 
     isSelling = true
 
-    for _, item in ipairs(matches) do
-        self:UseBagItem(item.bag, item.slot)
+    local submittedMoney = 0
+    local submittedItems = 0
+    local ok, message = pcall(function()
+        for _, item in ipairs(matches) do
+            if not self:UseBagItem(item.bag, item.slot) then
+                break
+            end
+            submittedMoney = submittedMoney + item.value
+            submittedItems = submittedItems + 1
+        end
+    end)
+    if not ok then
+        isSelling = false
+        error(message, 0)
     end
 
     local function PrintSummary()
-        if #matches > 0 then
-            ES.sessionTotal = (ES.sessionTotal or 0) + expectedMoney
-            ES.Print("Sold items for " .. GetCoinTextureString(expectedMoney) .. ".")
+        -- Release first: a formatting/UI error must not disable subsequent sales.
+        isSelling = false
+        if submittedItems > 0 then
+            ES.sessionTotal = (ES.sessionTotal or 0) + submittedMoney
+            ES.Print("Sold items for " .. GetCoinTextureString(submittedMoney) .. ".")
 
             if ES.RefreshOptions then
                 ES:RefreshOptions()
             end
         end
-
-        isSelling = false
     end
 
     if C_Timer and C_Timer.After then

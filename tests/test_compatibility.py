@@ -16,4 +16,5 @@ for client in ("retail", "classic"):
     for module in MODULES:
         lua.execute((ROOT / module).read_text(), name=module)
     lua.execute((ROOT / "tests/scenarios.lua").read_text())
+    lua.execute((ROOT / "tests/restrictions.lua").read_text())
     print(f"PASS: {client}: all {len(MODULES)} modules and compatibility scenarios (Lua 5.1)")
