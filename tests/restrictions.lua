@@ -7,7 +7,7 @@ db.whitelist = {}
 local scans = TEST_TOOLTIP_SCANS or 0
 assert(ES:IsBagItemSoulbound(0, 2))
 assert(not ES:IsBagItemSoulbound(0, 3))
-if TEST_CLIENT == "retail" then
+if TEST_CLIENT ~= "classic" then
     assert((TEST_TOOLTIP_SCANS or 0) == scans)
     assert(EasySellTooltip == nil)
 end

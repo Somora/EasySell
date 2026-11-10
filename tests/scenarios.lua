@@ -3,7 +3,7 @@ ES:InitializeDatabase()
 ES:RefreshOptions()
 assert(ES.generalPanel.sessionText.text == "Session total: 0 copper")
 ES:OpenOptions()
-assert(TEST_OPEN_CATEGORY == (TEST_CLIENT == "retail" and 35 or ES.optionsPanel))
+assert(TEST_OPEN_CATEGORY == (TEST_CLIENT ~= "classic" and 35 or ES.optionsPanel))
 
 local matches, money, count = ES:GetMatchingItems()
 assert(#matches == 1 and money == 24 and count == 2, "Default must sell only junk")
@@ -67,3 +67,19 @@ for _, frame in ipairs(TEST_FRAMES) do
     if frame.events.MERCHANT_SHOW then frame.scripts.OnEvent(frame, "MERCHANT_SHOW") end
 end
 assert(ES.playerLoggedIn)
+
+if TEST_CLIENT == "forever" then
+    -- Forever publishes the same engine global but a different ADDON_LOADED name.
+    ZygorGuidesViewer = ZGV
+    ZGV = nil
+    local db = ES:GetDB()
+    db.provider = ES.PROVIDER_ZYGOR
+    db.zygorDetected = false
+    db.providerPromptSignature = "selected"
+    for _, frame in ipairs(TEST_FRAMES) do
+        if frame.events.ADDON_LOADED then
+            frame.scripts.OnEvent(frame, "ADDON_LOADED", "ZygorGuidesViewerForever")
+        end
+    end
+    assert(db.zygorDetected, "Late-loading Forever Zygor must be detected immediately")
+end

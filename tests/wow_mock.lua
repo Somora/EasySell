@@ -99,7 +99,7 @@ function methods:SetBagItem(bag, slot)
     EasySellTooltipTextLeft2:SetText(TEST_SECRET or (item.bound and ITEM_SOULBOUND or "Unbound"))
 end
 function methods:NumLines() return 2 end
-if TEST_CLIENT == "retail" then
+if TEST_CLIENT ~= "classic" then
     -- No legacy GetItemInfo, GetCoinTextureString, container globals,
     -- IsAddOnLoaded, LE_ITEM_CLASS_*, or InterfaceOptions_* helpers.
     ItemLocation = {CreateFromBagAndSlot = function(_, bag, slot) return {bag = bag, slot = slot} end}

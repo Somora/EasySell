@@ -11,6 +11,7 @@ ES.PROVIDER_ELVUI = "elvui"
 ES.PROVIDER_ZYGOR = "zygor"
 ES.ELVUI_ADDON_NAME = "ElvUI"
 ES.ZYGOR_ADDON_NAME = "ZygorGuidesViewer"
+ES.ZYGOR_FOREVER_ADDON_NAME = "ZygorGuidesViewerForever"
 ES.POPUP_NAME = "EASYSELL_PROVIDER_SELECT"
 ES.promptedSessionSignature = ES.promptedSessionSignature or nil
 ES.playerLoggedIn = ES.playerLoggedIn or false
@@ -192,7 +193,7 @@ frame:SetScript("OnEvent", function(_, event, arg1)
     if event == "ADDON_LOADED" then
         if arg1 == ADDON_NAME then
             ES:InitializeDatabase()
-        elseif arg1 == ES.ELVUI_ADDON_NAME or arg1 == ES.ZYGOR_ADDON_NAME then
+        elseif arg1 == ES.ELVUI_ADDON_NAME or arg1 == ES.ZYGOR_ADDON_NAME or arg1 == ES.ZYGOR_FOREVER_ADDON_NAME then
             ES:InitializeDatabase()
             if ES.playerLoggedIn and ES.MaybePromptForProviderSelection and ES:MaybePromptForProviderSelection() then
                 return

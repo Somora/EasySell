@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.11
+
+- Declares support for WoW Forever 1.60.1 and handles the Forever edition of Zygor when it loads after login.
+
 ## 1.0.10
 
 - Uses C_Item.IsBound for Retail binding checks instead of rendering and scanning tooltips; retains an older-client fallback that rejects secret tooltip text.

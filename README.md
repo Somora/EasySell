@@ -2,7 +2,7 @@
 
 **EasySell** is a lightweight World of Warcraft addon that automatically sells vendor trash when you open a merchant. It pairs neatly with **EasyDelete**: EasyDelete clears deletion friction, EasySell clears bag clutter.
 
-Current release: `1.0.10`
+Current release: `1.0.11`
 
 ---
 
@@ -23,7 +23,7 @@ Current release: `1.0.10`
 - Choose account-wide or per-character settings
 - Configure through Blizzard's AddOns options menu or simple `/esell` commands
 - Remembers your settings between sessions
-- Versioned for Retail, Classic Era, TBC Classic, and Mists Classic clients
+- Versioned for Retail, Forever, Classic Era, TBC Classic, and Mists Classic clients
 
 ---
 
@@ -77,6 +77,7 @@ Install **EasySell** through the CurseForge app for your WoW client. The app wil
 1. Download and unzip the addon.
 2. Copy the `EasySell` folder into the correct AddOns folder:
    - `_retail_/Interface/AddOns`
+   - `_forever_/Interface/AddOns`
    - `_classic_era_/Interface/AddOns`
    - `_classic_/Interface/AddOns`
    - `_anniversary_/Interface/AddOns`
